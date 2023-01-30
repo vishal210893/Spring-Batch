@@ -1,0 +1,25 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres?connectTimeout=10000&socketTimeout=40&tcpKeepAlive=true
+    username: postgres
+    password: 123
+    driver-class-name: org.postgresql.Driver
+    tomcat:
+      test-on-borrow: true
+      jdbc-interceptors: org.apache.tomcat.jdbc.pool.interceptor.QueryTimeoutInterceptor(queryTimeout=60000)
+      validation-query: SELECT 1
+      max-active: 200
+      max-idle: 10
+      min-idle: 10
+      initial-size: 10
+      min-evictable-idle-time-millis: 10000
+      remove-abandoned: true
+      remove-abandoned-timeout: 10000
+      default-transaction-isolation: 1 #java.sql.Connection.TRANSACTION_READ_UNCOMMITTED
+      test-while-idle: true
+    type: org.apache.tomcat.jdbc.pool.DataSource
+
+server:
+  port: 8080
+  servlet:
+    context-path: /batch
