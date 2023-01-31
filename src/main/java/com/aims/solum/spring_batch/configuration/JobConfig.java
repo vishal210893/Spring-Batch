@@ -1,6 +1,7 @@
 package com.aims.solum.spring_batch.configuration;
 
 import com.aims.solum.spring_batch.listener.JobListener;
+import com.aims.solum.spring_batch.listener.StepListener;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.builder.JobBuilder;
@@ -33,10 +34,13 @@ public class JobConfig {
 
     @Bean
     @Qualifier("1stStep")
-    public Step firstStep(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+    public Step firstStep(JobRepository jobRepository, PlatformTransactionManager transactionManager, StepListener stepListener) {
         final TaskletStep taskletStep = new StepBuilder("First Step", jobRepository)
+                .listener(stepListener)
                 .tasklet((contribution, chunkContext) -> {
                     System.out.println("First tasklet step");
+                    System.out.println("Job Execution Context" + chunkContext.getStepContext().getJobExecutionContext());
+                    System.out.println("Step Execution Context" + chunkContext.getStepContext().getStepExecutionContext());
                     return RepeatStatus.FINISHED;
                 }, transactionManager)
                 .build();

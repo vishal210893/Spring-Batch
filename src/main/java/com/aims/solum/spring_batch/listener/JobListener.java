@@ -11,6 +11,7 @@ public class JobListener implements JobExecutionListener {
     public void beforeJob(JobExecution jobExecution) {
         System.out.println(jobExecution.getJobParameters());
         System.out.println(jobExecution.getExecutionContext());
+        jobExecution.getExecutionContext().put("jec", "jec value");
 
     }
 
