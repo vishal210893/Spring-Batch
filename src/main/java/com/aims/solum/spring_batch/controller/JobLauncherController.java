@@ -27,6 +27,10 @@ public class JobLauncherController {
     private Job job;
 
     @Autowired
+    @Qualifier("fileJob")
+    private Job fileJob;
+
+    @Autowired
     private StartJobService startJobService;
 
     @GetMapping("/startJob")
@@ -45,6 +49,12 @@ public class JobLauncherController {
     public ResponseEntity<String> stopJob(@RequestParam long id) throws Exception {
         jobOperator.stop(id);
         return ResponseEntity.ok().body("job with id " + id + " stopped");
+    }
+
+    @GetMapping("/fileJob")
+    public ResponseEntity<String> staartFileJob() throws Exception {
+        final JobExecution jobExecution = jobLauncher.run(fileJob, new JobParametersBuilder().addLong("time", System.currentTimeMillis()).toJobParameters());
+        return ResponseEntity.ok().body(jobExecution.getStatus().name() + " " + jobExecution.getJobId());
     }
 
 }
