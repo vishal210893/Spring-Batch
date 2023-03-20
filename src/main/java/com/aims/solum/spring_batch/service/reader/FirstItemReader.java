@@ -1,9 +1,8 @@
-package com.aims.solum.spring_batch.reader;
+package com.aims.solum.spring_batch.service.reader;
 
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.NonTransientResourceException;
 import org.springframework.batch.item.ParseException;
-import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -16,13 +15,13 @@ public class FirstItemReader implements ItemReader<Integer> {
     int i = 0;
 
     @Override
-    public Integer read() throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException {
+    public Integer read() throws ParseException, NonTransientResourceException {
         System.out.println("Inside item reader");
         if (i < list.size()) {
             return list.get(i++);
-        } else {
-            return null;
         }
+        i = 0;
+        return null;
     }
 
 }

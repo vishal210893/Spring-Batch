@@ -5,6 +5,7 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,13 +17,14 @@ public class JobLauncherController {
     JobLauncher jobLauncher;
 
     @Autowired
+    @Qualifier("2ndJob")
     Job job;
 
     @RequestMapping("/startJob")
     public ResponseEntity<String> handle() throws Exception {
         final JobExecution jobExecution = jobLauncher.run(job, new JobParametersBuilder()
                 .addLong("time", System.currentTimeMillis()).toJobParameters());
-        return ResponseEntity.ok().body(jobExecution.getStatus().name());
+        return ResponseEntity.ok().body(jobExecution.getStatus().name()+" "+jobExecution.getJobId());
     }
 
 }

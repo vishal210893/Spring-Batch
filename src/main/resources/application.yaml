@@ -18,7 +18,9 @@ spring:
       default-transaction-isolation: 1 #java.sql.Connection.TRANSACTION_READ_UNCOMMITTED
       test-while-idle: true
     type: org.apache.tomcat.jdbc.pool.DataSource
-
+  batch:
+    job:
+      enabled: false
 server:
   port: 8080
   servlet:

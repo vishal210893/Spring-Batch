@@ -1,10 +1,8 @@
 package com.aims.solum.spring_batch.configuration;
 
-import com.aims.solum.spring_batch.listener.JobListener;
-import com.aims.solum.spring_batch.listener.StepListener;
-import com.aims.solum.spring_batch.processor.FirstItemProcessor;
-import com.aims.solum.spring_batch.reader.FirstItemReader;
-import com.aims.solum.spring_batch.writer.FirstItemWriter;
+import com.aims.solum.spring_batch.service.processor.FirstItemProcessor;
+import com.aims.solum.spring_batch.service.reader.FirstItemReader;
+import com.aims.solum.spring_batch.service.writer.FirstItemWriter;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.builder.JobBuilder;
@@ -12,7 +10,9 @@ import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
+import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -30,18 +30,21 @@ public class ChunkJobConfig {
     private FirstItemWriter firstItemWriter;
 
     @Bean
+    @Qualifier("2ndJob")
     public Job chunkJob(JobRepository jobRepository,
-                        Step step,
-                        JobListener jobListener) {
+                        @Qualifier("chunkStep") Step firstChunkStep,
+                        @Qualifier("taskletStep") Step taskletStep) {
         final Job chunk_job = new JobBuilder("Chunk Job", jobRepository)
                 .incrementer(new RunIdIncrementer())
-                .start(step)
+                .start(firstChunkStep)
+                .next(taskletStep)
                 .build();
         return chunk_job;
     }
 
     @Bean
-    public Step createStep(JobRepository jobRepository, PlatformTransactionManager transactionManager, StepListener stepListener) {
+    @Qualifier("chunkStep")
+    public Step chunkStep(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
         final TaskletStep chunk_step = new StepBuilder("Chunk Step", jobRepository)
                 .<Integer, Long>chunk(3, transactionManager)
                 .reader(firstItemReader)
@@ -49,6 +52,18 @@ public class ChunkJobConfig {
                 .writer(firstItemWriter)
                 .build();
         return chunk_step;
+    }
+
+    @Bean
+    @Qualifier("taskletStep")
+    public Step taskletStep(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+        final TaskletStep taskletStep = new StepBuilder("Second Step", jobRepository)
+                .tasklet((contribution, chunkContext) -> {
+                    System.out.println("Second tasklet step");
+                    return RepeatStatus.FINISHED;
+                }, transactionManager)
+                .build();
+        return taskletStep;
     }
 
 }

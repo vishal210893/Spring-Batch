@@ -19,6 +19,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 public class JobConfig {
 
     @Bean
+    @Qualifier("1stJob")
     public Job firstJob(JobRepository jobRepository,
                         @Qualifier("1stStep") Step firstStep,
                         @Qualifier("2ndStep") Step secondStep,
