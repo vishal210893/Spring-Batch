@@ -1,7 +1,9 @@
 package com.aims.solum.spring_batch.configuration;
 
 import com.aims.solum.spring_batch.listener.JobListener;
+import com.aims.solum.spring_batch.listener.SkipListener;
 import com.aims.solum.spring_batch.model.StudentCsv;
+import com.aims.solum.spring_batch.service.processor.FileItemProcessor;
 import com.aims.solum.spring_batch.service.writer.FileItemWriter;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -9,11 +11,12 @@ import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
+import org.springframework.batch.core.step.skip.AlwaysSkipItemSkipPolicy;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.item.file.FlatFileItemReader;
+import org.springframework.batch.item.file.FlatFileParseException;
 import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
 import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
-import org.springframework.batch.item.file.mapping.DefaultLineMapper;
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 import org.springframework.batch.item.json.JacksonJsonObjectMarshaller;
 import org.springframework.batch.item.json.JsonFileItemWriter;
@@ -34,6 +37,12 @@ public class SampleJob {
 	@Autowired
 	private FileItemWriter fileItemWriter;
 
+	@Autowired
+	private FileItemProcessor fileItemProcessor;
+
+	@Autowired
+	private SkipListener skipListener;
+
 	@Bean
 	@Qualifier("fileJob")
 	public Job fileJob(JobRepository jobRepository,
@@ -52,9 +61,14 @@ public class SampleJob {
 		final TaskletStep fileStep = new StepBuilder("File Step", jobRepository)
 				.<StudentCsv, StudentCsv>chunk(3, transactionManager)
 				.reader(flatFileItemReader())
-				//.processor(firstItemProcessor)
+				.processor(fileItemProcessor)
 				//.writer(fileItemWriter)
 				.writer(jsonFileItemWriter())
+				.faultTolerant()
+				.skip(FlatFileParseException.class)
+				//.skipLimit(Integer.MAX_VALUE)
+				.skipPolicy(new AlwaysSkipItemSkipPolicy())
+				.listener(skipListener)
 				.build();
 		return fileStep;
 	}
