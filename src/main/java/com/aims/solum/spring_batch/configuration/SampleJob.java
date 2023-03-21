@@ -57,21 +57,17 @@ public class SampleJob {
 	public FlatFileItemReader<StudentCsv> flatFileItemReader() throws FileNotFoundException {
 		FlatFileItemReader<StudentCsv> flatFileItemReader = new FlatFileItemReader<>();
 		flatFileItemReader.setResource(new FileSystemResource(ResourceUtils.getFile("classpath:students.csv")));
-		flatFileItemReader.setLineMapper(new DefaultLineMapper<>() {
-			{
-				setLineTokenizer(new DelimitedLineTokenizer() {
-					{
-						setNames("ID", "First Name", "Last Name", "Email");
-					}
-				});
-				setFieldSetMapper(new BeanWrapperFieldSetMapper<>() {
-					{
-						setTargetType(StudentCsv.class);
-					}
-				});
 
-			}
-		});
+		final DelimitedLineTokenizer delimitedLineTokenizer = new DelimitedLineTokenizer();
+		delimitedLineTokenizer.setNames("ID", "First Name", "Last Name", "Email");
+		final BeanWrapperFieldSetMapper<StudentCsv> beanWrapperFieldSetMapper = new BeanWrapperFieldSetMapper<>();
+		beanWrapperFieldSetMapper.setTargetType(StudentCsv.class);
+
+		final DefaultLineMapper<StudentCsv> lineMapper = new DefaultLineMapper<>();
+		lineMapper.setLineTokenizer(delimitedLineTokenizer);
+		lineMapper.setFieldSetMapper(beanWrapperFieldSetMapper);
+
+		flatFileItemReader.setLineMapper(lineMapper);
 		flatFileItemReader.setLinesToSkip(1);
 		return flatFileItemReader;
 	}
