@@ -9,5 +9,5 @@ ID,First Name,Last Name,Email
 8,Tina,Kapoor,tina@gmail.com
 9,Mona,Sharma,mona@gmail.com
 10,Rahul,Varma,rahul@gmail.com
-11,Test Data,Bad Request,bad@gmail.com
+EXCEPTION,11,Test Data,Bad Request,bad@gmail.com
 12,Test Data,Good Data,good@gmail.com
