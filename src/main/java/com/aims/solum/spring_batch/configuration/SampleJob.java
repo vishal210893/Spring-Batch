@@ -7,14 +7,13 @@ import com.aims.solum.spring_batch.service.processor.FileItemProcessor;
 import com.aims.solum.spring_batch.service.writer.FileItemWriter;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
+import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
-import org.springframework.batch.core.step.skip.AlwaysSkipItemSkipPolicy;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.item.file.FlatFileItemReader;
-import org.springframework.batch.item.file.FlatFileParseException;
 import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
 import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
@@ -57,10 +56,10 @@ public class SampleJob {
 
 	@Bean
 	@Qualifier("fileStep")
-	public Step fileStep(JobRepository jobRepository, PlatformTransactionManager transactionManager) throws FileNotFoundException {
+	public Step fileStep(JobRepository jobRepository, PlatformTransactionManager transactionManager, FlatFileItemReader flatFileItemReader) throws FileNotFoundException {
 		final TaskletStep fileStep = new StepBuilder("File Step", jobRepository)
 				.<StudentCsv, StudentCsv>chunk(3, transactionManager)
-				.reader(flatFileItemReader())
+				.reader(flatFileItemReader)
 				.processor(fileItemProcessor)
 				//.writer(fileItemWriter)
 				.writer(jsonFileItemWriter())
@@ -76,7 +75,9 @@ public class SampleJob {
 		return fileStep;
 	}
 
-	private FlatFileItemReader<StudentCsv> flatFileItemReader() throws FileNotFoundException {
+	@Bean
+	@StepScope
+	public FlatFileItemReader<StudentCsv> flatFileItemReader() throws FileNotFoundException {
 
 		final DelimitedLineTokenizer delimitedLineTokenizer = new DelimitedLineTokenizer();
 		delimitedLineTokenizer.setNames("ID", "First Name", "Last Name", "Email");
