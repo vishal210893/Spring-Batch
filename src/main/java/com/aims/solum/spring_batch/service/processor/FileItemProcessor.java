@@ -7,13 +7,16 @@ import org.springframework.stereotype.Component;
 @Component
 public class FileItemProcessor implements ItemProcessor<StudentCsv, StudentCsv> {
 
-	@Override
-	public StudentCsv process(StudentCsv item) {
-		if (item.getId() == 12) {
-			System.out.println("Exception");
-			throw new NullPointerException();
-		}
-		return item;
-	}
+    @Override
+    public StudentCsv process(StudentCsv item) {
+        if (item.getId() == 8) {
+            System.out.println("Exception");
+            throw new NullPointerException();
+        }
+        if (item.getId() > 6 && item.getId() <= 9) {
+            System.out.println("Hello");
+        }
+        return item;
+    }
 
 }

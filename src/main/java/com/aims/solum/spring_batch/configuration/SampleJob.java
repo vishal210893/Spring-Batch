@@ -64,12 +64,13 @@ public class SampleJob {
 				//.writer(fileItemWriter)
 				.writer(jsonFileItemWriter())
 				.faultTolerant()
+				.processorNonTransactional()
 				//.skip(FlatFileParseException.class)
 				.skip(Throwable.class)
 				.skipLimit(5)
 				//.skipPolicy(new AlwaysSkipItemSkipPolicy())   /* not to use while using retry mechanism better to give some limit in skipLimit */
-				.retryLimit(2)
-				.retry(Throwable.class)
+				//.retryLimit(2)
+				//.retry(Throwable.class)
 				.listener(skipListener)
 				.build();
 		return fileStep;

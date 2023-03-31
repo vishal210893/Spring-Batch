@@ -2,6 +2,7 @@ package com.aims.solum.spring_batch.configuration;
 
 import com.aims.solum.spring_batch.listener.JobListener;
 import com.aims.solum.spring_batch.listener.StepListener;
+import com.aims.solum.spring_batch.service.ScheduleTest;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.builder.JobBuilder;
@@ -17,6 +18,11 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
 public class JobConfig {
+
+    @Bean
+    public ScheduleTest scheduleTest(){
+      return new ScheduleTest();
+    }
 
     @Bean
     @Qualifier("1stJob")
