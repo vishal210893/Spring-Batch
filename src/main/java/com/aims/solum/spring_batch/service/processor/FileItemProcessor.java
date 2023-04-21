@@ -14,7 +14,7 @@ public class FileItemProcessor implements ItemProcessor<StudentCsv, StudentCsv> 
             throw new NullPointerException();
         }
         if (item.getId() > 6 && item.getId() <= 9) {
-            System.out.println("Hello");
+            System.out.println(item.getId() + " Hello");
         }
         return item;
     }

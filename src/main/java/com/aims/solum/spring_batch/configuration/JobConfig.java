@@ -20,8 +20,8 @@ import org.springframework.transaction.PlatformTransactionManager;
 public class JobConfig {
 
     @Bean
-    public ScheduleTest scheduleTest(){
-      return new ScheduleTest();
+    public ScheduleTest scheduleTest() {
+        return new ScheduleTest();
     }
 
     @Bean
@@ -56,10 +56,13 @@ public class JobConfig {
 
     @Bean
     @Qualifier("2ndStep")
-    public Step SecondStep(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+    public Step SecondStep(JobRepository jobRepository, PlatformTransactionManager transactionManager, StepListener stepListener) {
         final TaskletStep taskletStep = new StepBuilder("Second Step", jobRepository)
+                .listener(stepListener)
                 .tasklet((contribution, chunkContext) -> {
                     System.out.println("Second tasklet step");
+                    System.out.println("Job Execution Context" + chunkContext.getStepContext().getJobExecutionContext());
+                    System.out.println("Step Execution Context" + chunkContext.getStepContext().getStepExecutionContext());
                     return RepeatStatus.FINISHED;
                 }, transactionManager)
                 .build();

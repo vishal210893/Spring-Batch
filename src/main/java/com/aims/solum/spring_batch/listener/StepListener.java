@@ -22,6 +22,7 @@ public class StepListener implements StepExecutionListener {
         System.out.println("After Step " + stepExecution.getStepName());
         System.out.println("Job Exec Cont " + stepExecution.getJobExecution().getExecutionContext());
         System.out.println("Step Exec Cont " + stepExecution.getExecutionContext());
+        stepExecution.getJobExecution().getExecutionContext().put("test", "hello");
         return null;
     }
 
